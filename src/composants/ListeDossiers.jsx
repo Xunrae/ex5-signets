@@ -2,10 +2,16 @@ import './ListeDossiers.scss';
 import Dossier from './Dossier';
 import * as crudDossiers from '../services/crud-dossiers';
 import { useState, useEffect } from 'react';
+import SimpleSelect from './SimpleSelect';
 
 export default function ListeDossiers({utilisateur, etatDossiers}) {
   // État des dossiers (vient du composant Appli)
   const [dossiers, setDossiers] = etatDossiers;
+  let tri;
+  // let tri = (document.getElementsByClassName("MuiSelect-nativeInput")[0].value);
+  if(document.getElementsByClassName("MuiSelect-nativeInput")[0]){
+    tri = (document.getElementsByClassName("MuiSelect-nativeInput")[0].value);
+  }
 
   // Lire les dossiers dans Firestore et forcer le réaffichage du composant
   // Remarquez que ce code est dans un useEffect() car on veut l'exécuter 
@@ -15,7 +21,7 @@ export default function ListeDossiers({utilisateur, etatDossiers}) {
   // forcé par la mutation de l'état des dossiers
   useEffect(
     () => {
-      crudDossiers.lireTout(utilisateur.uid).then(
+      crudDossiers.lireTout(utilisateur.uid, tri).then(
         dossiers => setDossiers(dossiers)
       )
     }, []
@@ -37,6 +43,7 @@ export default function ListeDossiers({utilisateur, etatDossiers}) {
   
   return (
     <>
+    <SimpleSelect util={utilisateur.uid} dossiers={dossiers} setDossiers={setDossiers} />
     <ul className="ListeDossiers">
       {
         (dossiers.length > 0) ?

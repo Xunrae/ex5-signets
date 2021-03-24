@@ -18,18 +18,42 @@ export async function creer(uid, dossier) {
 /**
  * Obtenir tous les dossiers de l'utilisateur connecté
  * @param {String} uid identifiant d'utilisateur Firebase
+ * @param {String} tri la sorte de tri utilisé
  * @returns {Promise<any[]>} Promesse avec le tableau des documents de dossiers
  */
-export async function lireTout(uid) {
+export async function lireTout(uid, tri) {
   const dossiers = [];
-  /************************************************************** Exercice #5 : question A **************************/
-  // Modifier très légèrement la ligne suivante
-  const reponse = await firestore.collection(utilRef).doc(uid).collection(dossRef).get();
+
+  let reponse;
+  
+//****************************************Code pour le point E*********************************** */
+  switch(tri){
+    case "date": 
+                  /************************************************************** Exercice #5 : question A **************************/
+                  // Modifier très légèrement la ligne suivante
+                  reponse = await firestore.collection(utilRef).doc(uid).collection(dossRef).orderBy("datemodif", "desc").get();
+                  break;
+
+    case "nomDesc":
+                    reponse = await firestore.collection(utilRef).doc(uid).collection(dossRef).orderBy("nom", "desc").get();
+                    break;
+                  
+    case "nomAsc": 
+                    reponse = await firestore.collection(utilRef).doc(uid).collection(dossRef).orderBy("nom").get();
+                    break;
+
+    default: 
+              reponse = await firestore.collection(utilRef).doc(uid).collection(dossRef).orderBy("datemodif", "desc").get();
+              break;
+  }
+
   reponse.forEach(
     doc => {
       dossiers.push({id: doc.id, ...doc.data()})
     }
   );
+
+
   return dossiers;
 }
 
@@ -42,7 +66,7 @@ export async function lireTout(uid) {
 export async function supprimer(uid, idd) {
   /************************************************************** Exercice #5 : question B **************************/
   // Une seule ligne de code suffit
-  // return await [votre instruction pour supprimer le dossier de l'utilisateur connecté dans Firestore ici];
+  return await firestore.collection(utilRef).doc(uid).collection(dossRef).doc(idd).delete();
 }
 
 /**
